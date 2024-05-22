@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 require('dotenv').config();
@@ -28,7 +28,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongooseConnection: mongoose.connection })
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // Asegúrate de que process.env.MONGO_URI esté configurado correctamente
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -45,7 +45,7 @@ app.use('/api/cart', cartRoutes);
 // Error Handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: 'An error occurred', error: err });
+    res.status(500).send('Something broke!');
 });
 
 // Puerto del servidor
